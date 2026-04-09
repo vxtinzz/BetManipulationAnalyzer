@@ -13,8 +13,8 @@ model User{
   password String 
   cpf String @unique
   role String @default("user")
-  pWin Int 
-  pWinBalance Int
+  pWin Int? 
+  pWinBalance Int?
   houseEdge Int @default(6) 
   balance Int @default(0)
   isActive Boolean @default(true)
