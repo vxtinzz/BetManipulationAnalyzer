@@ -32,3 +32,9 @@ export function update(id: string, data: any) {
     data,
   })
 }
+
+export function deleteUser(id: string, data: any){
+  return prisma.user.delete({
+    where: { id },
+  })
+}

@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import * as userRepository from "../repositories/user.repository"
-import { validateUserCreate, validateUserUpdate } from "../utils/validators"
+import { validateUserCreate, validateUserDelete, validateUserUpdate } from "../utils/validators"
 
 export async function createUser(data: any) {
   validateUserCreate(data)
@@ -15,7 +15,6 @@ export async function createUser(data: any) {
   if (cpfExists) {
     throw new Error("CPF already exists")
   }
-
 
   const hashedPassword = await bcrypt.hash(data.password, 10)
 
@@ -57,4 +56,43 @@ export async function updateUser(id: string, data: any) {
     }
 
     return userRepository.update(id, data)
+}
+
+export async function deleteUser(id: string, data: any) {
+    validateUserDelete(data)
+    if(!id){
+        throw new Error("Invalid Id")
+    }
+
+    const user = await userRepository.findById(id)
+
+    if(!user){
+        throw new Error("User not found")
+    }
+
+    if(!user.password){
+      throw new Error("Password is required")
+    }
+
+    if (data.username) {
+    const existsName = await userRepository.findByUsername(data.username)
+        if (existsName && existsName.id !== id) {
+            throw new Error("Invalid request")
+        }
+    }
+
+    if (data.cpf) {
+    const existsCpf = await userRepository.findByCpf(data.cpf)
+        if (existsCpf && existsCpf.id !== id) {
+            throw new Error("Invalid request")
+        }
+    }
+    console.log("DATA:", data)
+    const passwordIsValid = await bcrypt.compare(data.password,user.password.trim()) 
+    
+   // if(!passwordIsValid){
+     //   throw new Error("Invalid password")
+    //}
+
+    return userRepository.deleteUser(id, data)
 }

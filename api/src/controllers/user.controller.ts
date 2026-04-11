@@ -9,6 +9,7 @@ const userSchema = z.object({
   })
   
   const userSchemaUpdate = userSchema.partial().strict()
+  const userSchemaDelete = userSchema.partial().strict()
 
 export async function getUsers(req: Request, res: Response) {
   const users = await userService.getAllUsers()
@@ -33,6 +34,20 @@ export async function updateUser(req: Request, res: Response) {
   }
     const dataUpdate = userSchemaUpdate.parse(req.body)
     const result = await userService.updateUser(id, dataUpdate)
+    res.status(200).json(result)
+  } catch (err: any) {
+    res.status(422).json({error:err.message})
+  }
+}
+
+export async function deleteUser(req: Request, res: Response) {
+  try {
+    const { id } = req.params
+    if (typeof id !== "string") {
+      return res.status(400).json({ error: "Invalid Id" })
+  }
+    const dataDelete = userSchemaDelete.parse(req.body)
+    const result = await userService.deleteUser(id, dataDelete)
     res.status(200).json(result)
   } catch (err: any) {
     res.status(422).json({error:err.message})
