@@ -16,6 +16,12 @@ export function findById(id: string) {
   })
 }
 
+export function findByCpf(cpf: string){
+  return prisma.user.findUnique({
+    where: {cpf},
+  })
+}
+
 export function create(data: any) {
   return prisma.user.create({ data })
 }

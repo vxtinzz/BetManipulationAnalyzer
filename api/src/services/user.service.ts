@@ -1,22 +1,28 @@
 import bcrypt from "bcrypt"
 import * as userRepository from "../repositories/user.repository"
-import { validateUser } from "../utils/validators"
-import { error } from "node:console"
+import { validateUserCreate, validateUserUpdate } from "../utils/validators"
 
 export async function createUser(data: any) {
-  validateUser(data)
+  validateUserCreate(data)
 
   const exists = await userRepository.findByUsername(data.username)
+  const cpfExists = await userRepository.findByCpf(data.cpf)
 
   if (exists) {
     throw new Error("Username already exists")
   }
 
+  if (cpfExists) {
+    throw new Error("CPF already exists")
+  }
+
+
   const hashedPassword = await bcrypt.hash(data.password, 10)
 
   return userRepository.create({
-    ...data,
+    username: data.username,
     password: hashedPassword,
+    cpf: data.cpf,
   })
 }
 
@@ -25,7 +31,7 @@ export async function getAllUsers() {
 }
 
 export async function updateUser(id: string, data: any) {
-    validateUser(data)
+    validateUserUpdate(data)
     if(!id){
         throw new Error("Invalid Id")
     }
@@ -37,9 +43,16 @@ export async function updateUser(id: string, data: any) {
     }
 
     if (data.username) {
-    const exists = await userRepository.findByUsername(data.username)
-        if (exists && exists.id !== id) {
+    const existsName = await userRepository.findByUsername(data.username)
+        if (existsName && existsName.id !== id) {
             throw new Error("Username already exists")
+        }
+    }
+
+    if (data.cpf) {
+    const existsCpf = await userRepository.findByUsername(data.username)
+        if (existsCpf && existsCpf.id !== id) {
+            throw new Error("Cpf already exists")
         }
     }
 
