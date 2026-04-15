@@ -7,9 +7,16 @@ const userSchema = z.object({
     cpf: z.string(),
     password: z.string(),
   })
+
+  const userSchemaDelete = z.object({
+    password: z.string(),
+  })
+
+  const userIdSchema = z.object({
+    id: z.string(),
+  })
   
   const userSchemaUpdate = userSchema.partial().strict()
-  const userSchemaDelete = userSchema.partial().strict()
 
 export async function getUsers(req: Request, res: Response) {
   const users = await userService.getAllUsers()
@@ -45,9 +52,19 @@ export async function deleteUser(req: Request, res: Response) {
     const { id } = req.params
     if (typeof id !== "string") {
       return res.status(400).json({ error: "Invalid Id" })
-  }
+    }
     const dataDelete = userSchemaDelete.parse(req.body)
     const result = await userService.deleteUser(id, dataDelete)
+    res.status(200).json(result)
+  } catch (err: any) {
+    res.status(422).json({error:err.message})
+  }
+}
+
+export async function adminDeleteUser(req: Request, res: Response) {
+  try {
+    const { id } = userIdSchema.parse(req.params)
+    const result = await userService.adminDeleteUser(id)
     res.status(200).json(result)
   } catch (err: any) {
     res.status(422).json({error:err.message})

@@ -58,8 +58,8 @@ export async function updateUser(id: string, data: any) {
     return userRepository.update(id, data)
 }
 
-export async function deleteUser(id: string, data: any) {
-    validateUserDelete(data)
+export async function deleteUser(id: string, password: any) {
+    validateUserDelete(password)
     if(!id){
         throw new Error("Invalid Id")
     }
@@ -67,32 +67,36 @@ export async function deleteUser(id: string, data: any) {
     const user = await userRepository.findById(id)
 
     if(!user){
-        throw new Error("User not found")
+        await bcrypt.compare("fake-password", "$2b$10$fakehashfakehashfakehashfakehash")
+        throw new Error("Invalid Credencials")
     }
 
-    if(!user.password){
-      throw new Error("Password is required")
+    if(!password){
+      throw new Error("Invalid Credencials")
+    }
+    const passwordIsValid = await bcrypt.compare(password.password,user.password) 
+
+    if(!passwordIsValid){
+        throw new Error("Invalid Credencials")
     }
 
-    if (data.username) {
-    const existsName = await userRepository.findByUsername(data.username)
-        if (existsName && existsName.id !== id) {
-            throw new Error("Invalid request")
-        }
+    await userRepository.deleteUser(id)
+
+    return "User deleted successfully"
+}
+
+export async function adminDeleteUser(id: string) {
+    if(!id){
+        throw new Error("Invalid Id")
     }
 
-    if (data.cpf) {
-    const existsCpf = await userRepository.findByCpf(data.cpf)
-        if (existsCpf && existsCpf.id !== id) {
-            throw new Error("Invalid request")
-        }
-    }
-    console.log("DATA:", data)
-    const passwordIsValid = await bcrypt.compare(data.password,user.password.trim()) 
+    const user = await userRepository.findById(id)
     
-   // if(!passwordIsValid){
-     //   throw new Error("Invalid password")
-    //}
+    if(!user){
+        throw new Error("User not Found")
+    }
+    
+    await userRepository.deleteUser(id)
 
-    return userRepository.deleteUser(id, data)
+    return "User deleted successfully"
 }
