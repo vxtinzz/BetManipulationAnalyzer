@@ -1,11 +1,13 @@
 import express from "express"
 import userRoutes from "./routes/user.routes"
+import authRoutes from "./routes/auth.routes"
 
 const app = express()
 const PORT = 3000;
 
-app.use(express.json())
-app.use("/users", userRoutes)
+app.use(express.json({limit : "10kb"}))
+app.use("/user", userRoutes)
+app.use("/", authRoutes)
 
 app.use((req, res) => {
     res.status(404)

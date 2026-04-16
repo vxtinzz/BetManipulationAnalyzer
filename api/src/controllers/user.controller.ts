@@ -26,8 +26,8 @@ export async function getUsers(req: Request, res: Response) {
 export async function createUser(req: Request, res: Response) {
   try {
     const dataCreate = userSchema.parse(req.body);
-    const result = await userService.createUser(dataCreate)
-    res.status(201).json(result)
+    await userService.createUser(dataCreate)
+    res.status(201).send("User created successfully")
   } catch (err: any) {
     res.status(400).json({ error: err.message })
   }
@@ -40,8 +40,8 @@ export async function updateUser(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid Id" })
   }
     const dataUpdate = userSchemaUpdate.parse(req.body)
-    const result = await userService.updateUser(id, dataUpdate)
-    res.status(200).json(result)
+    await userService.updateUser(id, dataUpdate)
+    res.status(200).send("User updated successfully")
   } catch (err: any) {
     res.status(422).json({error:err.message})
   }
@@ -54,8 +54,8 @@ export async function deleteUser(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid Id" })
     }
     const dataDelete = userSchemaDelete.parse(req.body)
-    const result = await userService.deleteUser(id, dataDelete)
-    res.status(200).json(result)
+    await userService.deleteUser(id, dataDelete)
+    res.status(200).send("User deleted successfully")
   } catch (err: any) {
     res.status(422).json({error:err.message})
   }
@@ -64,8 +64,8 @@ export async function deleteUser(req: Request, res: Response) {
 export async function adminDeleteUser(req: Request, res: Response) {
   try {
     const { id } = userIdSchema.parse(req.params)
-    const result = await userService.adminDeleteUser(id)
-    res.status(200).json(result)
+    await userService.adminDeleteUser(id)
+    res.status(200).send("User deleted successfully")
   } catch (err: any) {
     res.status(422).json({error:err.message})
   }

@@ -8,12 +8,8 @@ export async function createUser(data: any) {
   const exists = await userRepository.findByUsername(data.username)
   const cpfExists = await userRepository.findByCpf(data.cpf)
 
-  if (exists) {
-    throw new Error("Username already exists")
-  }
-
-  if (cpfExists) {
-    throw new Error("CPF already exists")
+    if (exists || cpfExists) {
+    throw new Error("Invalid or already registered data")
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 10)
@@ -67,7 +63,7 @@ export async function deleteUser(id: string, password: any) {
     const user = await userRepository.findById(id)
 
     if(!user){
-        await bcrypt.compare("fake-password", "$2b$10$fakehashfakehashfakehashfakehash")
+        await bcrypt.compare("fake-password", "$2b$10$9WuW0iHmGl4QPQFW0lm4qOhfakehashwi.DXuPgJ07rKjkYHhiGm")
         throw new Error("Invalid Credencials")
     }
 
@@ -80,9 +76,7 @@ export async function deleteUser(id: string, password: any) {
         throw new Error("Invalid Credencials")
     }
 
-    await userRepository.deleteUser(id)
-
-    return "User deleted successfully"
+    return await userRepository.deleteUser(id)
 }
 
 export async function adminDeleteUser(id: string) {
@@ -95,8 +89,6 @@ export async function adminDeleteUser(id: string) {
     if(!user){
         throw new Error("User not Found")
     }
-    
-    await userRepository.deleteUser(id)
 
-    return "User deleted successfully"
+    return await userRepository.deleteUser(id)
 }
