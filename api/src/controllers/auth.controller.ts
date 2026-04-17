@@ -8,9 +8,14 @@ const userSchema = z.object({
     password: z.string(),
   })
 
+const userSchemaLogin = z.object({
+    username: z.string(),
+    password: z.string(),
+  })
+
 export async function loginUser(req: Request, res: Response) {
   try {
-    const user = userSchema.parse(req.body);
+    const user = userSchemaLogin.parse(req.body);
     const foundUser = await authService.loginUser(user)
     res.status(200).send(foundUser)
   } catch (err: any) {

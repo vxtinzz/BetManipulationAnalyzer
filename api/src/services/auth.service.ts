@@ -2,7 +2,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import "dotenv/config"
 import * as userRepository from "../repositories/user.repository"
-import { validateUserCreate } from "../utils/validators"
+import { validateUserCreate, validateUserLogin } from "../utils/validators"
 
 export async function registerUser(data: any) {
   validateUserCreate(data)
@@ -24,7 +24,7 @@ export async function registerUser(data: any) {
 }
 
 export async function loginUser(data: any) {
-  validateUserCreate(data)
+  validateUserLogin(data)
  try {
    const foundUser = await userRepository.findByUsername(data.username);
 

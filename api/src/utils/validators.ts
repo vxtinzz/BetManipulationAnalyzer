@@ -43,3 +43,15 @@ export function validateUserDelete({password}: any) {
       throw new Error("Invalid password")
     }
 }
+
+export function validateUserLogin({ username, password}: any) {
+  const userNameRegex = /^[a-zA-Z0-9]{3,30}$/
+
+  if(typeof username !=="string" || username.trim().length === 0 || !userNameRegex.test(username)){
+    throw new Error("Invalid username")
+  }
+
+  if (!password || password.length < 6) {
+    throw new Error("Password too short")
+  }
+}  

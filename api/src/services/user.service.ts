@@ -14,7 +14,7 @@ export async function createUser(data: any) {
 
   const hashedPassword = await bcrypt.hash(data.password, 10)
 
-  return userRepository.create({
+   return userRepository.create({
     username: data.username,
     password: hashedPassword,
     cpf: data.cpf,
@@ -23,6 +23,20 @@ export async function createUser(data: any) {
 
 export async function getAllUsers() {
   return userRepository.findAll()
+}
+
+export async function getUser(id: string) {
+    if(!id){
+        throw new Error("Invalid Id")
+    }
+
+    const user = await userRepository.findById(id)
+    
+    if(!user){
+        throw new Error("User not found")
+    }
+
+    return user;
 }
 
 export async function updateUser(id: string, data: any) {

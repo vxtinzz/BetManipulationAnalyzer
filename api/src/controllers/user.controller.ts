@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import * as userService from "../services/user.service"
+import { CustomRequest } from "../middleware/auth.middleware"
 import { z } from "zod"
 
 const userSchema = z.object({
@@ -18,9 +19,43 @@ const userSchema = z.object({
   
   const userSchemaUpdate = userSchema.partial().strict()
 
-export async function getUsers(req: Request, res: Response) {
+export async function adminGetUsers(req: Request, res: Response) {
   const users = await userService.getAllUsers()
   res.json(users)
+}
+
+export async function adminGetUser(req: Request, res: Response) {
+  try {
+    const { id } = req.params
+    if(typeof id !== "string"){
+      return res.status(400).json({error: "Invalid Id"})
+    }
+    const user = await userService.getUser(id)
+    res.status(200).json(user)
+  } catch (err: any) {
+   res.status(400).json({ error: err.message  }) 
+  }
+}
+
+export async function getUser(req: Request, res: Response) {
+  try {
+    const userReq = (req as CustomRequest).user
+
+  if (typeof userReq === "string") {
+  return res.status(401).json({ error: "Invalid token payload" })
+  }
+
+    const id = userReq.id
+
+    if(typeof id !== "string"){
+      return res.status(400).json({error: "Invalid Id"})
+    }
+    
+    const userFounded = await userService.getUser(id)
+    res.status(200).json(userFounded)
+  } catch (err: any) {
+   res.status(400).json({ error: err.message  }) 
+  }
 }
 
 export async function createUser(req: Request, res: Response) {
@@ -33,12 +68,30 @@ export async function createUser(req: Request, res: Response) {
   }
 }
 
-export async function updateUser(req: Request, res: Response) {
+export async function adminUpdateUser(req: Request, res: Response) {
   try {
     const { id } = req.params
     if (typeof id !== "string") {
       return res.status(400).json({ error: "Invalid Id" })
   }
+    const dataUpdate = userSchemaUpdate.parse(req.body)
+    await userService.updateUser(id, dataUpdate)
+    res.status(200).send("User updated successfully")
+  } catch (err: any) {
+    res.status(422).json({error:err.message})
+  }
+}
+
+export async function updateUser(req: Request, res: Response) {
+  try {
+    const userReq = (req as CustomRequest).user
+
+  if (typeof userReq === "string") {
+    return res.status(401).json({ error: "Invalid token payload" })
+  }
+
+    const id = userReq.id
+
     const dataUpdate = userSchemaUpdate.parse(req.body)
     await userService.updateUser(id, dataUpdate)
     res.status(200).send("User updated successfully")
