@@ -4,7 +4,7 @@ import { auth } from "../middleware/auth.middleware"
 
 const router = Router()
 
-//admin
+//user
 router.get("/me", auth, getUser)
 router.patch("/me", auth, updateUser)
 router.delete("/me", auth, deleteUser)

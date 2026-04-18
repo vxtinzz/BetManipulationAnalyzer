@@ -16,7 +16,7 @@ export function validateUserCreate({ username, password, cpf }: any) {
 }  
 
 export function validateUserUpdate({ username, password, cpf }: any) {
-  const userNameRegex = /^[a-zA-Z0-9]{3,30}$/
+  const userNameRegex = /^(?=.{3,30}$)[a-z0-9]+([._]?[a-z0-9]+)*$/
   const cpfRegex = /^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/
 
   if(username !== undefined){

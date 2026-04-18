@@ -39,14 +39,15 @@ export async function loginUser(data: any) {
         throw new Error("Invalid Credencials")
     }
 
-     const token = jwt.sign({ id: foundUser.id.toString(), username: foundUser.username }, process.env.SECRET_KEY!, {
+     const token = jwt.sign({ id: foundUser.id.toString(), username: foundUser.username, role: foundUser.role }, process.env.SECRET_KEY!, {
        expiresIn: '2d',
      });
 
      return { 
       user: { 
         id: foundUser.id, 
-        username:foundUser.username 
+        username:foundUser.username,
+        role:foundUser.role
       },
       token: token 
     };
