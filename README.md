@@ -1,4 +1,3 @@
 ## Backlog
-- replace bcrypt to argon2
+- replace bcrypt
 - Implement refresh token / acess token
-- Authorize Function
