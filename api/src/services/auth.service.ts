@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
 import * as userRepository from "../repositories/user.repository"
+import * as refreshRepository from "../repositories/refresh.repository"
 import { validateUserCreate, validateUserLogin } from "../utils/validators"
 
 export async function registerUser(data: any) {
@@ -33,7 +34,7 @@ export async function loginUser(data: any) {
     throw new Error("Invalid Credencials")
    }
 
-   const userMatch = await  bcrypt.compare(data.password,foundedUser.password)
+   const userMatch = await bcrypt.compare(data.password,foundedUser.password)
 
     if(!userMatch){
         throw new Error("Invalid Credencials")
@@ -43,9 +44,19 @@ export async function loginUser(data: any) {
        expiresIn: '1h',
      });
 
-     const refreshToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "refresh" }, process.env.SECRET_KEY!, {
+     const refreshToken = jwt.sign({ id: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
        expiresIn: '7d',
      });
+
+     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+     const expiresAt = new Date();
+     expiresAt.setDate(expiresAt.getDate() + 7);
+
+     await refreshRepository.refreshTokenRepository.create({
+      tokenHash: refreshTokenHash,
+      userId: foundedUser.id,
+      expiresAt: expiresAt
+     })
 
      return { 
       user: { 
@@ -60,4 +71,6 @@ export async function loginUser(data: any) {
  } catch (error) {
    throw error;
  }
+
+//refresh function
 }
