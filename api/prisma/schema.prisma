@@ -18,6 +18,20 @@ model User{
   houseEdge Int @default(6) 
   balance Int @default(0)
   isActive Boolean @default(true)
+  refreshTokens RefreshToken[]
   createAt DateTime @default(now())
   UpdateAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
