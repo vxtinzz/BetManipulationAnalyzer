@@ -26,30 +26,35 @@ export async function registerUser(data: any) {
 export async function loginUser(data: any) {
   validateUserLogin(data)
  try {
-   const foundUser = await userRepository.findByUsername(data.username);
+   const foundedUser = await userRepository.findByUsername(data.username);
 
-   if(!foundUser){
+   if(!foundedUser){
     await bcrypt.compare("fake-password", "$2b$10$9WuW0iHmGl4QPQFW0lm4qOhfakehashwi.DXuPgJ07rKjkYHhiGm")
     throw new Error("Invalid Credencials")
    }
 
-   const userMatch = await  bcrypt.compare(data.password,foundUser.password)
+   const userMatch = await  bcrypt.compare(data.password,foundedUser.password)
 
     if(!userMatch){
         throw new Error("Invalid Credencials")
     }
 
-     const token = jwt.sign({ id: foundUser.id.toString(), username: foundUser.username, role: foundUser.role }, process.env.SECRET_KEY!, {
-       expiresIn: '2d',
+     const acessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "acess"}, process.env.SECRET_KEY!, {
+       expiresIn: '1h',
+     });
+
+     const refreshToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "refresh" }, process.env.SECRET_KEY!, {
+       expiresIn: '7d',
      });
 
      return { 
       user: { 
-        id: foundUser.id, 
-        username:foundUser.username,
-        role:foundUser.role
+        id: foundedUser.id, 
+        username:foundedUser.username,
+        role:foundedUser.role
       },
-      token: token 
+      acessToken: acessToken,
+      refreshToken: refreshToken
     };
 
  } catch (error) {
