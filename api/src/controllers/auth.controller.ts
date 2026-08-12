@@ -26,9 +26,27 @@ export async function loginUser(req: Request, res: Response) {
 export async function registerUser(req: Request, res: Response) {
   try {
     const user = userSchema.parse(req.body);
-    const result = await authService.registerUser(user)
+    await authService.registerUser(user)
     res.status(200).send("User created successfully")
   } catch (err: any) {
     res.status(400).json({ error: err.message })
+  }
+}
+
+export async function refreshToken(req: Request, res: Response) {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Refresh Token is invalid, expired or revoked"
+      });
+    }
+
+    const refresh = await authService.refresh(refreshToken)
+    res.status(200).send(refresh)
+    
+  } catch (err: any) {
+    res.status(400).json({error: err.message})
   }
 }
