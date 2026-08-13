@@ -1,4 +1,4 @@
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { findById } from "../repositories/user.repository"
 import "dotenv/config"
@@ -8,12 +8,14 @@ export interface JwtUserPayload {
   id: string
   username: string
   role: string
+  type: string
 }
 
 const jwtUserSchema = z.object({
     id: z.string(),
     username: z.string(),
-    role: z.enum(["user","admin"])
+    role: z.enum(["user","admin"]),
+    type: z.literal("access")
   })
 
 export interface CustomRequest extends Request {
@@ -48,23 +50,23 @@ export function auth(req: Request, res: Response, next: NextFunction) {
 export function authorize(...roles: string[]){
   return async function(req: Request, res: Response, next: NextFunction){
     try{
-      const user = (req as CustomRequest).user
+      const user = (req as CustomRequest).user;
 
       if(!user){
-        return res.sendStatus(401)
+        return res.sendStatus(401);
       }
 
-      const dbUser = await findById(user.id)
+      const dbUser = await findById(user.id);
 
       if(!dbUser || dbUser.role !== user.role){
-        return res.sendStatus(403)
+        return res.sendStatus(403);
       }
 
     if(!roles.includes(user.role)){
-      return res.sendStatus(403)
+      return res.sendStatus(403);
     }
 
-    next()
+    next();
   }catch(err){
     next(err)
     }
