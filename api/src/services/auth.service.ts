@@ -1,10 +1,15 @@
 import bcrypt from "bcrypt"
+import { z } from "zod"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
 import * as userRepository from "../repositories/user.repository"
 import * as refreshRepository from "../repositories/refresh.repository"
 import { validateUserCreate, validateUserLogin } from "../utils/validators"
-import { hash } from "node:crypto"
+
+const jwtRefreshSchema = z.object({
+  id: z.string(),
+  type: z.literal("refresh")
+})
 
 export async function registerUser(data: any) {
   validateUserCreate(data)
@@ -41,7 +46,7 @@ export async function loginUser(data: any) {
         throw new Error("Invalid Credencials")
     }
 
-     const acessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "acess"}, process.env.SECRET_KEY!, {
+     const accessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
        expiresIn: '1h',
      });
 
@@ -65,7 +70,7 @@ export async function loginUser(data: any) {
         username:foundedUser.username,
         role:foundedUser.role
       },
-      acessToken: acessToken,
+      accessToken: accessToken,
       refreshToken: refreshToken
     };
 
@@ -76,10 +81,8 @@ export async function loginUser(data: any) {
 
 export async function refresh(refreshToken: string) {
   try{
-      const payload = jwt.verify(refreshToken, process.env.SECRET_KEY!, { algorithms:['HS256']}) as JwtPayload;
-      if(payload.type !== 'refresh'){
-         throw new Error("Unauthorized")
-      }
+      const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY!, { algorithms:['HS256']}) as JwtPayload;
+      const payload = jwtRefreshSchema.parse(decoded);
       
       const foundedUser = await userRepository.findById(payload.id);
 
@@ -103,7 +106,7 @@ export async function refresh(refreshToken: string) {
         throw new Error("Invalid Refresh Token")
       }     
 
-      const newAcessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "acess"}, process.env.SECRET_KEY!, {
+      const newAccessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
        expiresIn: '1h',
      });
 
@@ -129,7 +132,7 @@ export async function refresh(refreshToken: string) {
         username:foundedUser.username,
         role:foundedUser.role
       },
-      acessToken: newAcessToken,
+      accessToken: newAccessToken,
       refreshToken: newRefreshToken
     };
   } catch (error){
