@@ -118,13 +118,13 @@ export async function refresh(refreshToken: string) {
      const expiresAt = new Date();
      expiresAt.setDate(expiresAt.getDate() + 7);
 
-     await refreshRepository.create({
+     const data = {
       tokenHash: newRefreshTokenHash,
       userId: foundedUser.id,
       expiresAt: expiresAt
-     })
+     };
 
-     await refreshRepository.revokeTokenById(validToken.id)
+     await refreshRepository.rotateToken(data ,validToken.id)
 
      return { 
       user: { 
