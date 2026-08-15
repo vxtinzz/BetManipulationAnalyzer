@@ -11,7 +11,13 @@ const jwtRefreshSchema = z.object({
   type: z.literal("refresh")
 })
 
-export async function registerUser(data: any) {
+interface CreateUserData {
+  username: string;
+  cpf: string;
+  password: string;
+}
+
+export async function registerUser(data: CreateUserData) {
   validateUserCreate(data)
 
   const exists = await userRepository.findByUsername(data.username)
@@ -92,10 +98,9 @@ export async function refresh(refreshToken: string) {
 
       const foundedHash = await refreshRepository.findByUserId(foundedUser.id);
       let validToken = null;
-
-      for (const hashTest of foundedHash) {
+      console.log(foundedHash)
+      for (const hashTest of foundedHash) {     
         const isValid = await bcrypt.compare(refreshToken, hashTest.tokenHash);
-
         if(isValid){
           validToken = hashTest;
           break;
@@ -104,8 +109,8 @@ export async function refresh(refreshToken: string) {
 
       if(!validToken){
         throw new Error("Invalid Refresh Token")
-      }     
-
+      }
+      
       const newAccessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
        expiresIn: '1h',
      });
