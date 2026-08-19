@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt"
+import crypto from "crypto"
 import { z } from "zod"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
@@ -10,6 +11,21 @@ const jwtRefreshSchema = z.object({
   id: z.string(),
   type: z.literal("refresh")
 })
+
+function hashRefreshToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex")
+}
+
+function refreshTokenMatches(providedTokenHash: string, storedTokenHash: string): boolean {
+  const providedBuffer = Buffer.from(providedTokenHash, "hex")
+  const storedBuffer = Buffer.from(storedTokenHash, "hex")
+
+  if (providedBuffer.length !== storedBuffer.length) {
+    return false
+  }
+
+  return crypto.timingSafeEqual(providedBuffer, storedBuffer)
+}
 
 interface CreateUserData {
   username: string;
@@ -60,7 +76,7 @@ export async function loginUser(data: any) {
        expiresIn: '7d',
      });
 
-     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+     const refreshTokenHash = hashRefreshToken(refreshToken);
      const expiresAt = new Date();
      expiresAt.setDate(expiresAt.getDate() + 7);
 
@@ -97,17 +113,18 @@ export async function refresh(refreshToken: string) {
       }
 
       const foundedHash = await refreshRepository.findByUserId(foundedUser.id);
+      const incomingTokenHash = hashRefreshToken(refreshToken);
       let validToken = null;
-      console.log(foundedHash)
+
       for (const hashTest of foundedHash) {     
-        const isValid = await bcrypt.compare(refreshToken, hashTest.tokenHash);
+        const isValid = refreshTokenMatches(incomingTokenHash, hashTest.tokenHash);
         if(isValid){
           validToken = hashTest;
           break;
         }
       }
 
-      if(!validToken){
+      if(!validToken || validToken.revokedAt){
         throw new Error("Invalid Refresh Token")
       }
       
@@ -119,7 +136,7 @@ export async function refresh(refreshToken: string) {
        expiresIn: '7d',
      });
 
-     const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
+     const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
      const expiresAt = new Date();
      expiresAt.setDate(expiresAt.getDate() + 7);
 
