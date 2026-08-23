@@ -1,4 +1,3 @@
 ## Backlog
-- replace id to userId on refreshToken
-- replace bcrypt to crypto 
-- Implement refresh token / acess token
+- Implement refresh token / access token
+- Remove return user's data on login 

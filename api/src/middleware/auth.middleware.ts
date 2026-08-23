@@ -62,7 +62,7 @@ export function authorize(...roles: string[]){
         return res.sendStatus(403);
       }
 
-    if(!roles.includes(user.role)){
+    if(!roles.includes(dbUser.role)){
       return res.sendStatus(403);
     }
 

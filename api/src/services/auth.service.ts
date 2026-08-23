@@ -8,9 +8,15 @@ import * as refreshRepository from "../repositories/refresh.repository"
 import { validateUserCreate, validateUserLogin } from "../utils/validators"
 
 const jwtRefreshSchema = z.object({
-  id: z.string(),
+  userId: z.string(),
   type: z.literal("refresh")
 })
+
+interface CreateUserData {
+  username: string;
+  cpf: string;
+  password: string;
+}
 
 function hashRefreshToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex")
@@ -25,12 +31,6 @@ function refreshTokenMatches(providedTokenHash: string, storedTokenHash: string)
   }
 
   return crypto.timingSafeEqual(providedBuffer, storedBuffer)
-}
-
-interface CreateUserData {
-  username: string;
-  cpf: string;
-  password: string;
 }
 
 export async function registerUser(data: CreateUserData) {
@@ -68,11 +68,11 @@ export async function loginUser(data: any) {
         throw new Error("Invalid Credencials")
     }
 
-     const accessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
+     const accessToken = jwt.sign({ userId: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
        expiresIn: '1h',
      });
 
-     const refreshToken = jwt.sign({ id: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
+     const refreshToken = jwt.sign({ userId: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
        expiresIn: '7d',
      });
 
@@ -106,7 +106,7 @@ export async function refresh(refreshToken: string) {
       const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY!, { algorithms:['HS256']}) as JwtPayload;
       const payload = jwtRefreshSchema.parse(decoded);
       
-      const foundedUser = await userRepository.findById(payload.id);
+      const foundedUser = await userRepository.findById(payload.userId);
 
       if(!foundedUser){
         throw new Error("Invalid Refresh Token")
@@ -128,11 +128,11 @@ export async function refresh(refreshToken: string) {
         throw new Error("Invalid Refresh Token")
       }
       
-      const newAccessToken = jwt.sign({ id: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
+      const newAccessToken = jwt.sign({ userId: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
        expiresIn: '1h',
      });
 
-     const newRefreshToken = jwt.sign({ id: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
+     const newRefreshToken = jwt.sign({ userId: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
        expiresIn: '7d',
      });
 
