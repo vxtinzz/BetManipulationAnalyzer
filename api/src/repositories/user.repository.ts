@@ -1,24 +1,26 @@
 import prisma from "../config/prisma"
 
 export function findAll() {
-  return prisma.user.findMany()
+  return prisma.user.findMany({
+    where: { isActive: true, },
+  })
 }
 
 export function findByUsername(username: string) {
   return prisma.user.findUnique({
-    where: { username },
+    where: { username, isActive: true, },
   })
 }
 
 export function findById(id: string) {
   return prisma.user.findUnique({
-    where: { id },
+    where: { id, isActive: true, },
   })
 }
 
 export function findByCpf(cpf: string){
   return prisma.user.findUnique({
-    where: {cpf},
+    where: { cpf, isActive: true, },
   })
 }
 
@@ -28,7 +30,7 @@ export function create(data: any) {
 
 export function update(id: string, data: any) {
   return prisma.user.update({
-    where: { id },
+    where: { id, isActive: true, },
     data,
   })
 }
