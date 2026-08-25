@@ -5,14 +5,14 @@ import "dotenv/config"
 import { z } from "zod"
 
 export interface JwtUserPayload {
-  id: string
+  userId: string
   username: string
   role: string
   type: string
 }
 
 const jwtUserSchema = z.object({
-    id: z.string(),
+    userId: z.string(),
     username: z.string(),
     role: z.enum(["user","admin"]),
     type: z.literal("access")
@@ -56,7 +56,7 @@ export function authorize(...roles: string[]){
         return res.sendStatus(401);
       }
 
-      const dbUser = await findById(user.id);
+      const dbUser = await findById(user.userId);
 
       if(!dbUser || dbUser.role !== user.role){
         return res.sendStatus(403);

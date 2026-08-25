@@ -43,7 +43,7 @@ export async function adminGetUser(req: Request, res: Response) {
 export async function getUser(req: Request, res: Response) {
   try {
     const userReq = (req as CustomRequest).user
-    const id = userReq.id
+    const id = userReq.userId
     const userFounded = await userService.getUser(id)
     if (!userFounded) {
       return res.status(404).json({ error: "User not found" })
@@ -81,7 +81,7 @@ export async function adminUpdateUser(req: Request, res: Response) {
 export async function updateUser(req: Request, res: Response) {
   try {
     const userReq = (req as CustomRequest).user
-    const id = userReq.id
+    const id = userReq.userId
     const dataUpdate = userSchemaUpdate.parse(req.body)
     await userService.updateUser(id, dataUpdate)
     res.status(200).send("User updated successfully")
