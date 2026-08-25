@@ -92,10 +92,8 @@ export async function updateUser(req: Request, res: Response) {
 
 export async function deleteUser(req: Request, res: Response) {
   try {
-    const { id } = req.params
-    if (typeof id !== "string") {
-      return res.status(400).json({ error: "Invalid Id" })
-    }
+    const userReq = (req as CustomRequest).user
+    const id = userReq.userId
     const dataDelete = userSchemaDelete.parse(req.body)
     await userService.deleteUser(id, dataDelete)
     res.status(200).send("User deleted successfully")
