@@ -22,7 +22,7 @@ export interface CustomRequest extends Request {
  user: JwtUserPayload;
 }
 
-export function auth(req: Request, res: Response, next: NextFunction) {
+export async function auth(req: Request, res: Response, next: NextFunction) {
  try {
     const authHeader = req.headers.authorization;
 
@@ -38,6 +38,12 @@ export function auth(req: Request, res: Response, next: NextFunction) {
 
    const decoded = jwt.verify(token, process.env.SECRET_KEY!,{ algorithms:['HS256']}) as JwtUserPayload;
    const user = jwtUserSchema.parse(decoded);
+
+   const foundedUser = await findById(user.userId);
+
+    if (!foundedUser || !foundedUser.isActive) {
+        throw new Error("User is inactive");
+    }
 
    (req as CustomRequest).user = user;
 
