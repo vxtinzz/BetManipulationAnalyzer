@@ -65,6 +65,9 @@ export async function updateUser(id: string, data: any) {
         }
     }
 
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    data.password = hashedPassword;
+
     return userRepository.update(id, data)
 }
 
@@ -84,7 +87,7 @@ export async function deleteUser(id: string, password: any) {
     if(!password){
       throw new Error("Invalid Credencials")
     }
-    
+
     const passwordIsValid = await bcrypt.compare(password.password,user.password) 
 
     if(!passwordIsValid){
