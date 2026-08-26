@@ -35,8 +35,34 @@ export function update(id: string, data: any) {
   })
 }
 
-export function deleteUser(id: string){
+export function requestUserDelete(id: string) {
+  return prisma.user.update({
+    where: { id, isActive: true, },
+    data: {
+      isActive: false,
+      deletedAt: new Date()
+    }
+  })
+}
+
+export function adminDeleteUser(id: string){
   return prisma.user.delete({
     where: { id },
   })
+}
+
+async function cleanupInactiveUsers() {
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() - 30);
+
+  const result = await prisma.user.deleteMany({
+    where: {
+      isActive: false,
+      deletedAt: {
+        lte: expirationDate
+      }
+    }
+  });
+
+  console.log(`${result.count} users removed!`);
 }
