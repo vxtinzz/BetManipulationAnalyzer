@@ -5,3 +5,6 @@
 - filter getMe of commonUser 
 - verify if user1 can use user2 access and refresh tokens
 - consume an API with the frontend
+- fix admin and user Update (storage password in pure text when updated)
+- fix findbyUserId return when isActive is false
+- change probability fields at db
