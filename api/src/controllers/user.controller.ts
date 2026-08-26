@@ -24,13 +24,13 @@ export async function adminGetUsers(req: Request, res: Response) {
   res.json(users)
 }
 
-export async function adminGetUser(req: Request, res: Response) {
+export async function adminGetUserById(req: Request, res: Response) {
   try {
     const { id } = req.params
     if(typeof id !== "string"){
       return res.status(400).json({error: "Invalid Id"})
     }
-    const user = await userService.getUser(id)
+    const user = await userService.getAdmin(id)
     if (!user) {
       return res.status(404).json({ error: "User not found" })
     }
@@ -45,6 +45,20 @@ export async function getUser(req: Request, res: Response) {
     const userReq = (req as CustomRequest).user
     const id = userReq.userId
     const userFounded = await userService.getUser(id)
+    if (!userFounded) {
+      return res.status(404).json({ error: "User not found" })
+  }
+    res.status(200).json(userFounded)
+  } catch (err: any) {
+   res.status(400).json({ error: err.message  }) 
+  }
+}
+
+export async function getAdminMe(req: Request, res: Response) {
+  try {
+    const userReq = (req as CustomRequest).user
+    const id = userReq.userId
+    const userFounded = await userService.getAdmin(id)
     if (!userFounded) {
       return res.status(404).json({ error: "User not found" })
   }
