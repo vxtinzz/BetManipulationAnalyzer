@@ -36,7 +36,40 @@ export async function getUser(id: string) {
         throw new Error("User not found")
     }
 
-    return user;
+    const selectedData = {
+        "id": user.id,
+        "username": user.username,
+        "role": user.role,
+        "balance": user.balance
+    }
+
+    return selectedData;
+}
+
+export async function getAdmin(id: string) {
+    if(!id){
+        throw new Error("Invalid Id")
+    }
+
+    const user = await userRepository.findById(id)
+    
+    if(!user){
+        throw new Error("User not found")
+    }
+
+    const selectedData = {
+        "id": user.id,
+        "username": user.username,
+        "cpf": user.cpf,
+        "role": user.role,
+        "balance": user.balance,
+        "isActive": user.isActive,
+        "createAt": user.createAt,
+        "updateAt": user.updateAt,
+        "deleteAt": user.deleteAt
+    }
+
+    return selectedData;
 }
 
 export async function updateUser(id: string, data: any) {
