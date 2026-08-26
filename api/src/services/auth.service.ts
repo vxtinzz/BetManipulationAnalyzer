@@ -87,11 +87,6 @@ export async function loginUser(data: any) {
      })
 
      return { 
-      user: { 
-        id: foundedUser.id, 
-        username:foundedUser.username,
-        role:foundedUser.role
-      },
       accessToken: accessToken,
       refreshToken: refreshToken
     };
@@ -149,11 +144,6 @@ export async function refresh(refreshToken: string) {
      await refreshRepository.rotateToken(data ,validToken.id)
 
      return { 
-      user: { 
-        id: foundedUser.id, 
-        username:foundedUser.username,
-        role:foundedUser.role
-      },
       accessToken: newAccessToken,
       refreshToken: newRefreshToken
     };
