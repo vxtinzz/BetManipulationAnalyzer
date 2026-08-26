@@ -84,13 +84,14 @@ export async function deleteUser(id: string, password: any) {
     if(!password){
       throw new Error("Invalid Credencials")
     }
+    
     const passwordIsValid = await bcrypt.compare(password.password,user.password) 
 
     if(!passwordIsValid){
         throw new Error("Invalid Credencials")
     }
 
-    return await userRepository.deleteUser(id)
+    return await userRepository.requestUserDelete(id)
 }
 
 export async function adminDeleteUser(id: string) {
@@ -104,5 +105,5 @@ export async function adminDeleteUser(id: string) {
         throw new Error("User not Found")
     }
 
-    return await userRepository.deleteUser(id)
+    return await userRepository.adminDeleteUser(id)
 }
