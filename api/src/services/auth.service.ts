@@ -69,7 +69,7 @@ export async function loginUser(data: any) {
     }
 
      const accessToken = jwt.sign({ userId: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
-       expiresIn: '1h',
+       expiresIn: '15m',
      });
 
      const refreshToken = jwt.sign({ userId: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
@@ -129,7 +129,7 @@ export async function refresh(refreshToken: string) {
       }
       
       const newAccessToken = jwt.sign({ userId: foundedUser.id.toString(), username: foundedUser.username, role: foundedUser.role, type: "access"}, process.env.SECRET_KEY!, {
-       expiresIn: '1h',
+       expiresIn: '15m',
      });
 
      const newRefreshToken = jwt.sign({ userId: foundedUser.id.toString(), type: "refresh" }, process.env.SECRET_KEY!, {
