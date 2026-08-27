@@ -1,9 +1,20 @@
 import prisma from "../config/prisma"
 
-export function findAll() {
+export function findAll(page: number, limit: number) {
   return prisma.user.findMany({
     select: { id: true, username: true, role: true, balance: true, isActive: true, createAt: true, updateAt: true, deleteAt: true },
-  })
+
+    skip: (page - 1) * limit,
+    take: limit,
+    
+    orderBy: {
+      createAt: "desc"
+    }
+  });
+}
+
+export function countUsers() {
+  return prisma.user.count();
 }
 
 export function findByUsername(username: string) {
