@@ -30,6 +30,11 @@ export const paginationSchema = z.object({
     order: z.enum(["asc", "desc"]).default("desc")
   });
 
+export const jwtRefreshSchema = z.object({
+  userId: z.string(),
+  type: z.literal("refresh")
+})
+
 export const userCreateSchema = z.object({
   username: usernameSchema,
   password: passwordSchema,
