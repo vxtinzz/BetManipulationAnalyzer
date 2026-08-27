@@ -16,11 +16,18 @@ const userSchema = z.object({
   const userIdSchema = z.object({
     id: z.string(),
   })
+
+  const paginationSchema = z.object({
+    page: z.coerce.number().int().positive().default(1)
+  })
   
   const userSchemaUpdate = userSchema.partial().strict()
 
 export async function adminGetUsers(req: Request, res: Response) {
-  const users = await userService.getAllUsers()
+  const limit = 10
+  const { page } = paginationSchema.parse(req.query)
+
+  const users = await userService.getAllUsers(page, limit)
   res.json(users)
 }
 
