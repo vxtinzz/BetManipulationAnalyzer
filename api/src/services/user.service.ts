@@ -75,9 +75,9 @@ export async function getAdmin(id: string) {
         "role": user.role,
         "balance": user.balance,
         "isActive": user.isActive,
-        "createAt": user.createAt,
-        "updateAt": user.updateAt,
-        "deleteAt": user.deleteAt
+        "createdAt": user.createdAt,
+        "updatedAt": user.updatedAt,
+        "deletedAt": user.deletedAt
     }
 
     return selectedData;
