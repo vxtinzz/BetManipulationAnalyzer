@@ -5,7 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
 import * as userRepository from "../repositories/user.repository"
 import * as refreshRepository from "../repositories/refresh.repository"
-import { validateUserCreate, validateUserLogin } from "../utils/validators"
+import * as validators from "../utils/validators"
 
 const jwtRefreshSchema = z.object({
   userId: z.string(),
@@ -34,21 +34,21 @@ function refreshTokenMatches(providedTokenHash: string, storedTokenHash: string)
 }
 
 export async function registerUser(data: CreateUserData) {
-  validateUserCreate(data)
+  const validatedData = validators.userCreateSchema.parse(data)
 
-  const exists = await userRepository.findByUsername(data.username)
-  const cpfExists = await userRepository.findByCpf(data.cpf)
+  const exists = await userRepository.findByUsername(validatedData.username)
+  const cpfExists = await userRepository.findByCpf(validatedData.cpf)
 
   if (exists || cpfExists) {
     throw new Error("Invalid or already registered data")
   }
   
-  const hashedPassword = await bcrypt.hash(data.password, 10)
+  const hashedPassword = await bcrypt.hash(validatedData.password, 10)
 
   return userRepository.create({
-    username: data.username,
+    username: validatedData.username,
     password: hashedPassword,
-    cpf: data.cpf,
+    cpf: validatedData.cpf,
   })
 }
 
