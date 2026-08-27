@@ -18,16 +18,18 @@ const userSchema = z.object({
   })
 
   const paginationSchema = z.object({
-    page: z.coerce.number().int().positive().default(1)
+    page: z.coerce.number().int().positive().default(1),
+    sortBy: z.enum(["username", "balance", "createdAt"]).default("createdAt"),
+    order: z.enum(["asc", "desc"]).default("desc")
   })
   
   const userSchemaUpdate = userSchema.partial().strict()
 
 export async function adminGetUsers(req: Request, res: Response) {
   const limit = 10
-  const { page } = paginationSchema.parse(req.query)
+  const { page, sortBy, order } = paginationSchema.parse(req.query)
 
-  const users = await userService.getAllUsers(page, limit)
+  const users = await userService.getAllUsers(page, limit, sortBy, order)
   res.json(users)
 }
 

@@ -1,6 +1,6 @@
 import prisma from "../config/prisma"
 
-export function findAll(page: number, limit: number) {
+export function findAll(page: number, limit: number, sortBy: string, order: string) {
   return prisma.user.findMany({
     select: { id: true, username: true, role: true, balance: true, isActive: true, createAt: true, updateAt: true, deleteAt: true },
 
@@ -8,7 +8,7 @@ export function findAll(page: number, limit: number) {
     take: limit,
     
     orderBy: {
-      createAt: "desc"
+      [sortBy]: order
     }
   });
 }
