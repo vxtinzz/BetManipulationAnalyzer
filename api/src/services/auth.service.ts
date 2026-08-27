@@ -1,16 +1,10 @@
 import bcrypt from "bcrypt"
 import crypto from "crypto"
-import { z } from "zod"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import "dotenv/config"
 import * as userRepository from "../repositories/user.repository"
 import * as refreshRepository from "../repositories/refresh.repository"
 import * as validators from "../utils/validators"
-
-const jwtRefreshSchema = z.object({
-  userId: z.string(),
-  type: z.literal("refresh")
-})
 
 interface CreateUserData {
   username: string;
@@ -99,7 +93,7 @@ export async function loginUser(data: any) {
 export async function refresh(refreshToken: string) {
   try{
       const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY!, { algorithms:['HS256']}) as JwtPayload;
-      const payload = jwtRefreshSchema.parse(decoded);
+      const payload = validators.jwtRefreshSchema.parse(decoded);
       
       const foundedUser = await userRepository.findById(payload.userId);
 
