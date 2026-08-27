@@ -1,25 +1,5 @@
 import bcrypt from "bcrypt"
 import * as userRepository from "../repositories/user.repository"
-import { validateUserCreate, validateUserDelete, validateUserUpdate } from "../utils/validators"
-
-export async function createUser(data: any) {
-  validateUserCreate(data)
-
-  const exists = await userRepository.findByUsername(data.username)
-  const cpfExists = await userRepository.findByCpf(data.cpf)
-
-    if (exists || cpfExists) {
-    throw new Error("Invalid or already registered data")
-  }
-
-  const hashedPassword = await bcrypt.hash(data.password, 10)
-
-   return userRepository.create({
-    username: data.username,
-    password: hashedPassword,
-    cpf: data.cpf,
-  })
-}
 
 export async function getAllUsers(page: number, limit: number, sortBy: string, order: string) {
   const usersData = await userRepository.findAll(page, limit, sortBy, order)
@@ -84,7 +64,7 @@ export async function getAdmin(id: string) {
 }
 
 export async function updateUser(id: string, data: any) {
-    validateUserUpdate(data)
+
     if(!id){
         throw new Error("Invalid Id")
     }
@@ -103,7 +83,7 @@ export async function updateUser(id: string, data: any) {
     }
 
     if (data.cpf) {
-    const existsCpf = await userRepository.findByUsername(data.username)
+    const existsCpf = await userRepository.findByCpf(data.cpf)
         if (existsCpf && existsCpf.id !== id) {
             throw new Error("Cpf already exists")
         }
@@ -116,7 +96,7 @@ export async function updateUser(id: string, data: any) {
 }
 
 export async function deleteUser(id: string, password: any) {
-    validateUserDelete(password)
+
     if(!id){
         throw new Error("Invalid Id")
     }
@@ -132,7 +112,7 @@ export async function deleteUser(id: string, password: any) {
       throw new Error("Invalid Credencials")
     }
 
-    const passwordIsValid = await bcrypt.compare(password.password,user.password) 
+    const passwordIsValid = await bcrypt.compare(password,user.password) 
 
     if(!passwordIsValid){
         throw new Error("Invalid Credencials")
