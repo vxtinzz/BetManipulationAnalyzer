@@ -2,7 +2,7 @@ import prisma from "../config/prisma"
 
 export function findAll(page: number, limit: number, sortBy: string, order: string) {
   return prisma.user.findMany({
-    select: { id: true, username: true, role: true, balance: true, isActive: true, createdAt: true, updateAt: true, deleteAt: true },
+    select: { id: true, username: true, role: true, balance: true, isActive: true, createdAt: true, updatedAt: true, deletedAt: true },
 
     skip: (page - 1) * limit,
     take: limit,
