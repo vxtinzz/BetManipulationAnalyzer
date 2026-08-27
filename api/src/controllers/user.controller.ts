@@ -1,5 +1,6 @@
 import { Request, Response } from "express"
 import * as userService from "../services/user.service"
+import * as authService from "../services/auth.service"
 import { CustomRequest } from "../middleware/auth.middleware"
 import { z } from "zod"
 
@@ -80,7 +81,7 @@ export async function getAdminMe(req: Request, res: Response) {
 export async function createUser(req: Request, res: Response) {
   try {
     const dataCreate = userSchema.parse(req.body);
-    await userService.createUser(dataCreate)
+    await authService.registerUser(dataCreate)
     res.status(201).send("User created successfully")
   } catch (err: any) {
     res.status(400).json({ error: err.message })
