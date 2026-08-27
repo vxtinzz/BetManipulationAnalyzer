@@ -1,21 +1,10 @@
 import { Request, Response } from "express"
 import * as authService from "../services/auth.service"
-import { z } from "zod"
-
-const userSchema = z.object({
-    username: z.string(),
-    cpf: z.string(),
-    password: z.string(),
-  })
-
-const userSchemaLogin = z.object({
-    username: z.string(),
-    password: z.string(),
-  })
+import * as validators from "../utils/validators"
 
 export async function loginUser(req: Request, res: Response) {
   try {
-    const user = userSchemaLogin.parse(req.body);
+    const user = validators.userLoginSchema.parse(req.body)
     const foundUser = await authService.loginUser(user)
     res.status(200).send(foundUser)
   } catch (err: any) {
@@ -25,7 +14,7 @@ export async function loginUser(req: Request, res: Response) {
 
 export async function registerUser(req: Request, res: Response) {
   try {
-    const user = userSchema.parse(req.body);
+    const user = validators.userCreateSchema.parse(req.body);
     await authService.registerUser(user)
     res.status(200).send("User created successfully")
   } catch (err: any) {
