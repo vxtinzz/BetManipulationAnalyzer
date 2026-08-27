@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { loginUser, registerUser, refreshToken} from "../controllers/auth.controller"
+import { loginUser, registerUser, refreshToken, revokeToken} from "../controllers/auth.controller"
 
 const router = Router()
 
@@ -7,5 +7,6 @@ const router = Router()
 router.post("/login", loginUser)
 router.post("/register", registerUser)
 router.post("/refresh", refreshToken)
+router.post("/logout", revokeToken)
 
 export default router

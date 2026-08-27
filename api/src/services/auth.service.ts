@@ -145,3 +145,37 @@ export async function refresh(refreshToken: string) {
     throw error;
   }
 }
+
+export async function revokeToken(refreshToken: string) {
+  try{
+      const decoded = jwt.verify(refreshToken, process.env.SECRET_KEY!, { algorithms:['HS256']}) as JwtPayload;
+      const payload = validators.jwtRefreshSchema.parse(decoded);
+      
+      const foundedUser = await userRepository.findById(payload.userId);
+
+      if(!foundedUser){
+        throw new Error("Invalid Refresh Token")
+      }
+
+      const foundedHash = await refreshRepository.findByUserId(foundedUser.id);
+      const incomingTokenHash = hashRefreshToken(refreshToken);
+      let validToken = null;
+
+      for (const hashTest of foundedHash) {     
+        const isValid = refreshTokenMatches(incomingTokenHash, hashTest.tokenHash);
+        if(isValid){
+          validToken = hashTest;
+          break;
+        }
+      }
+
+      if(!validToken || validToken.revokedAt){
+        throw new Error("Invalid Refresh Token")
+      }
+
+     await refreshRepository.revokeToken(validToken.id)
+     
+  } catch (error){
+    throw error;
+  }
+}

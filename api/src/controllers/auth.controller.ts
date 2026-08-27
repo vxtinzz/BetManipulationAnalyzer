@@ -39,3 +39,21 @@ export async function refreshToken(req: Request, res: Response) {
     res.status(400).json({error: err.message})
   }
 }
+
+export async function revokeToken(req: Request, res: Response) {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Refresh Token is invalid, expired or revoked"
+      });
+    }
+
+    await authService.refresh(refreshToken)
+    res.status(200).json({status: "token revoked"})
+    
+  } catch (err: any) {
+    res.status(400).json({error: err.message})
+  }
+}

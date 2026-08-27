@@ -20,7 +20,6 @@ export function findByUserId(userId: string) {
   });
 }
 
-
 export async function rotateToken(data: {
     tokenHash: string;
     userId: string;
@@ -40,3 +39,14 @@ export async function rotateToken(data: {
       return newToken;
     })
 }
+
+export function revokeToken(tokenId: string){
+  prisma.refreshToken.update({
+    where: {
+      id: tokenId
+      },
+    data: {
+      revokedAt: new Date()
+      }
+   });
+} 
