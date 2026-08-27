@@ -21,8 +21,19 @@ export async function createUser(data: any) {
   })
 }
 
-export async function getAllUsers() {
-  return userRepository.findAll()
+export async function getAllUsers(page: number, limit: number) {
+  const usersData = await userRepository.findAll(page, limit)
+  const totalUsers = await userRepository.countUsers()
+
+  return {
+    data: usersData,
+    pagination: {
+        page,
+        limit,
+        totalUsers,
+        totalPages: Math.ceil(totalUsers / limit)
+    }
+  }
 }
 
 export async function getUser(id: string) {
