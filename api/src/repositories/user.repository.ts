@@ -2,7 +2,7 @@ import prisma from "../config/prisma"
 
 export function findAll() {
   return prisma.user.findMany({
-    where: { isActive: true, },
+    select: { id: true, username: true, role: true, balance: true, isActive: true, createAt: true, updateAt: true, deleteAt: true },
   })
 }
 
