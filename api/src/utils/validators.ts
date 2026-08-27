@@ -31,8 +31,15 @@ export const paginationSchema = z.object({
   });
 
 export const jwtRefreshSchema = z.object({
-  userId: z.string(),
+  userId: idSchema,
   type: z.literal("refresh")
+})
+
+export const jwtAccessSchema = z.object({
+    userId: idSchema,
+    username: usernameSchema,
+    role: z.enum(["user","admin"]),
+    type: z.literal("access")
 })
 
 export const userCreateSchema = z.object({

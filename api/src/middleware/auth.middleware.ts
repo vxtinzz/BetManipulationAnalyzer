@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { findById } from "../repositories/user.repository"
 import "dotenv/config"
-import { z } from "zod"
+import { jwtAccessSchema } from '../utils/validators';
 
 export interface JwtUserPayload {
   userId: string
@@ -10,13 +10,6 @@ export interface JwtUserPayload {
   role: string
   type: string
 }
-
-const jwtUserSchema = z.object({
-    userId: z.string(),
-    username: z.string(),
-    role: z.enum(["user","admin"]),
-    type: z.literal("access")
-  })
 
 export interface CustomRequest extends Request {
  user: JwtUserPayload;
@@ -37,7 +30,7 @@ export async function auth(req: Request, res: Response, next: NextFunction) {
    } 
 
    const decoded = jwt.verify(token, process.env.SECRET_KEY!,{ algorithms:['HS256']}) as JwtUserPayload;
-   const user = jwtUserSchema.parse(decoded);
+   const user = jwtAccessSchema.parse(decoded);
 
    const foundedUser = await findById(user.userId);
 
