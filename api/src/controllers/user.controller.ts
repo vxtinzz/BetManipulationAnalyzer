@@ -2,33 +2,12 @@ import { Request, Response } from "express"
 import * as userService from "../services/user.service"
 import * as authService from "../services/auth.service"
 import { CustomRequest } from "../middleware/auth.middleware"
-import { z } from "zod"
+import * as validators from "../utils/validators"
 
-const userSchema = z.object({
-    username: z.string(),
-    cpf: z.string(),
-    password: z.string(),
-  })
-
-  const userSchemaDelete = z.object({
-    password: z.string(),
-  })
-
-  const userIdSchema = z.object({
-    id: z.string(),
-  })
-
-  const paginationSchema = z.object({
-    page: z.coerce.number().int().positive().default(1),
-    sortBy: z.enum(["username", "balance", "createdAt"]).default("createdAt"),
-    order: z.enum(["asc", "desc"]).default("desc")
-  })
-  
-  const userSchemaUpdate = userSchema.partial().strict()
 
 export async function adminGetUsers(req: Request, res: Response) {
   const limit = 10
-  const { page, sortBy, order } = paginationSchema.parse(req.query)
+  const { page, sortBy, order } = validators.paginationSchema.parse(req.query)
 
   const users = await userService.getAllUsers(page, limit, sortBy, order)
   res.json(users)
@@ -80,7 +59,7 @@ export async function getAdminMe(req: Request, res: Response) {
 
 export async function createUser(req: Request, res: Response) {
   try {
-    const dataCreate = userSchema.parse(req.body);
+    const dataCreate = validators.userCreateSchema.parse(req.body);
     await authService.registerUser(dataCreate)
     res.status(201).send("User created successfully")
   } catch (err: any) {
@@ -94,7 +73,7 @@ export async function adminUpdateUser(req: Request, res: Response) {
     if (typeof id !== "string") {
       return res.status(400).json({ error: "Invalid Id" })
   }
-    const dataUpdate = userSchemaUpdate.parse(req.body)
+    const dataUpdate = validators.userUpdateSchema.parse(req.body)
     await userService.updateUser(id, dataUpdate)
     res.status(200).send("User updated successfully")
   } catch (err: any) {
@@ -106,7 +85,7 @@ export async function updateUser(req: Request, res: Response) {
   try {
     const userReq = (req as CustomRequest).user
     const id = userReq.userId
-    const dataUpdate = userSchemaUpdate.parse(req.body)
+    const dataUpdate = validators.userUpdateSchema.parse(req.body)
     await userService.updateUser(id, dataUpdate)
     res.status(200).send("User updated successfully")
   } catch (err: any) {
@@ -118,7 +97,7 @@ export async function deleteUser(req: Request, res: Response) {
   try {
     const userReq = (req as CustomRequest).user
     const id = userReq.userId
-    const dataDelete = userSchemaDelete.parse(req.body)
+    const dataDelete = validators.userDeleteSchema.parse(req.body)
     await userService.deleteUser(id, dataDelete)
     res.status(200).send("User deleted successfully")
   } catch (err: any) {
@@ -128,7 +107,7 @@ export async function deleteUser(req: Request, res: Response) {
 
 export async function adminDeleteUser(req: Request, res: Response) {
   try {
-    const { id } = userIdSchema.parse(req.params)
+    const { id } = validators.userIdSchema.parse(req.params)
     await userService.adminDeleteUser(id)
     res.status(200).send("User deleted successfully")
   } catch (err: any) {
