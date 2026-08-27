@@ -53,16 +53,16 @@ export async function registerUser(data: CreateUserData) {
 }
 
 export async function loginUser(data: any) {
-  validateUserLogin(data)
+  const validatedData = validators.userLoginSchema.parse(data)
  try {
-   const foundedUser = await userRepository.findByUsername(data.username);
+   const foundedUser = await userRepository.findByUsername(validatedData.username);
 
    if(!foundedUser){
     await bcrypt.compare("fake-password", "$2b$10$9WuW0iHmGl4QPQFW0lm4qOhfakehashwi.DXuPgJ07rKjkYHhiGm")
     throw new Error("Invalid Credencials")
    }
 
-   const userMatch = await bcrypt.compare(data.password,foundedUser.password)
+   const userMatch = await bcrypt.compare(validatedData.password,foundedUser.password)
 
     if(!userMatch){
         throw new Error("Invalid Credencials")
