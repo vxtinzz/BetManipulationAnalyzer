@@ -1,57 +1,38 @@
-export function validateUserCreate({ username, password, cpf }: any) {
-  const userNameRegex = /^[a-zA-Z0-9]{3,30}$/
-  const cpfRegex = /^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/
+import { z } from "zod"
 
-  if(typeof username !=="string" || username.trim().length === 0 || !userNameRegex.test(username)){
-    throw new Error("Invalid username")
-  }
+const usernameSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^(?=.{3,30}$)[a-z0-9]+([._]?[a-z0-9]+)*$/,
+    "Invalid username"
+  );
 
-   if(typeof cpf !=="string" || cpf.trim().length === 0 || !cpfRegex.test(cpf)){
-     throw new Error("Invalid CPF")
-  }
+const cpfSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/,
+    "Invalid CPF"
+  );
 
-  if (!password || password.length < 6) {
-    throw new Error("Password too short")
-  }
-}  
+const passwordSchema = z
+  .string()
+  .min(6, "Password too short");
 
-export function validateUserUpdate({ username, password, cpf }: any) {
-  const userNameRegex = /^(?=.{3,30}$)[a-z0-9]+([._]?[a-z0-9]+)*$/
-  const cpfRegex = /^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$/
+export const userCreateSchema = z.object({
+  username: usernameSchema,
+  password: passwordSchema,
+  cpf: cpfSchema
+});
 
-  if(username !== undefined){
-    if(typeof username !=="string" || username.trim().length === 0 || !userNameRegex.test(username)){
-      throw new Error("Invalid username")
-    }
-}
+export const userUpdateSchema = userCreateSchema.partial();
 
-  if(cpf !== undefined){
-    if(typeof cpf !=="string" || cpf.trim().length === 0 || !cpfRegex.test(cpf)){
-      throw new Error("Invalid CPF")
-    }
-  }
+export const userDeleteSchema = z.object({
+  password: passwordSchema
+});
 
-  if(password !== undefined){
-    if (!password || password.length < 6) {
-      throw new Error("Invalid Password")
-    }
-  }
-}
-
-export function validateUserDelete({password}: any) {
-    if (!password || password.length < 6) {
-      throw new Error("Invalid password")
-    }
-}
-
-export function validateUserLogin({ username, password}: any) {
-  const userNameRegex = /^[a-zA-Z0-9]{3,30}$/
-
-  if(typeof username !=="string" || username.trim().length === 0 || !userNameRegex.test(username)){
-    throw new Error("Invalid username")
-  }
-
-  if (!password || password.length < 6) {
-    throw new Error("Password too short")
-  }
-}  
+export const userLoginSchema = z.object({
+  username: usernameSchema,
+  password: passwordSchema
+});
