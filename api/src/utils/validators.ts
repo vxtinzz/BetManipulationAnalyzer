@@ -20,13 +20,27 @@ const passwordSchema = z
   .string()
   .min(6, "Password too short");
 
+const idSchema = z
+  .string()
+  .trim()
+
+export const paginationSchema = z.object({
+    page: z.coerce.number().int().positive().default(1),
+    sortBy: z.enum(["username", "balance", "createdAt"]).default("createdAt"),
+    order: z.enum(["asc", "desc"]).default("desc")
+  });
+
 export const userCreateSchema = z.object({
   username: usernameSchema,
   password: passwordSchema,
   cpf: cpfSchema
 });
 
-export const userUpdateSchema = userCreateSchema.partial();
+export const userUpdateSchema = z.object({
+  username: usernameSchema.optional(),
+  password: passwordSchema,
+  cpf: cpfSchema.optional()
+});
 
 export const userDeleteSchema = z.object({
   password: passwordSchema
@@ -35,4 +49,8 @@ export const userDeleteSchema = z.object({
 export const userLoginSchema = z.object({
   username: usernameSchema,
   password: passwordSchema
+});
+
+export const userIdSchema = z.object({
+  id: idSchema
 });
