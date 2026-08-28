@@ -95,7 +95,8 @@ export async function updateUser(id: string, data: any) {
     return userRepository.update(id, data)
 }
 
-export async function deleteUser(id: string, password: any) {
+export async function deleteUser(id: string, data: any) {
+    const { password } = data
 
     if(!id){
         throw new Error("Invalid Id")
@@ -113,7 +114,7 @@ export async function deleteUser(id: string, password: any) {
     }
 
     const passwordIsValid = await bcrypt.compare(password,user.password) 
-
+    
     if(!passwordIsValid){
         throw new Error("Invalid Credencials")
     }
