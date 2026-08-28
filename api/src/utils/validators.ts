@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export const MINUTES = 60 * 1000;
+
 const usernameSchema = z
   .string()
   .trim()
