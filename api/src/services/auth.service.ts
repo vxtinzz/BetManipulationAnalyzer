@@ -47,8 +47,8 @@ export async function registerUser(data: CreateUserData) {
 }
 
 export async function loginUser(data: any) {
-  const validatedData = validators.userLoginSchema.parse(data)
  try {
+   const validatedData = validators.userLoginSchema.parse(data)
    const foundedUser = await userRepository.findByUsername(validatedData.username);
 
    if(!foundedUser){
