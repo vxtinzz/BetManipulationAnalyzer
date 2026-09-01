@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt"
 import * as userRepository from "../repositories/user.repository"
+import { userLoginSchema } from "../utils/validators"
 
 export async function getAllUsers(page: number, limit: number, sortBy: string, order: string) {
   const usersData = await userRepository.findAll(page, limit, sortBy, order)
@@ -134,4 +135,31 @@ export async function adminDeleteUser(id: string) {
     }
 
     return await userRepository.adminDeleteUser(id)
+}
+
+export async function restoreAccount(data: any) {
+ try {
+   const validatedData = userLoginSchema.parse(data)
+   const foundedUser = await userRepository.findRestorableUserByUsername(validatedData.username);
+
+   if(!foundedUser){
+    await bcrypt.compare("fake-password", "$2b$10$9WuW0iHmGl4QPQFW0lm4qOhfakehashwi.DXuPgJ07rKjkYHhiGm")
+    throw new Error("Invalid Credencials")
+   }
+
+   const userMatch = await bcrypt.compare(validatedData.password,foundedUser.password)
+
+    if(!userMatch){
+        throw new Error("Invalid Credencials")
+    }
+
+    await userRepository.restoreAccountById(foundedUser.id)
+
+     return { 
+      restoredUser: foundedUser.username
+    };
+
+ } catch (error) {
+    throw error;
+ }
 }
