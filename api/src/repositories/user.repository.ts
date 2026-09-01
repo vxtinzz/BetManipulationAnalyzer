@@ -23,6 +23,12 @@ export function findByUsername(username: string) {
   })
 }
 
+export function findRestorableUserByUsername(username: string) {
+  return prisma.user.findUnique({
+    where: { username, isActive: false, },
+  })
+}
+
 export function findById(id: string) {
   return prisma.user.findUnique({
     where: { id, isActive: true, },
