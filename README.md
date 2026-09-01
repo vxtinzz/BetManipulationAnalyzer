@@ -1,4 +1,4 @@
 ## Backlog
 - consume an API with the frontend
-- implement rate limit
 - test CRUD 
+- add restore account end-point

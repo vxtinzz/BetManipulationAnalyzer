@@ -56,6 +56,16 @@ export function requestUserDelete(id: string) {
   })
 }
 
+export function restoreAccountById(id: string) {
+  return prisma.user.update({
+    where: { id, isActive: false, },
+    data: {
+      isActive: true,
+      deletedAt: null
+    }
+  })
+}
+
 export function adminDeleteUser(id: string){
   return prisma.user.delete({
     where: { id },
