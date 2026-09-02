@@ -135,29 +135,3 @@ export async function adminDeleteUser(id: string) {
 
     return await userRepository.adminDeleteUser(id)
 }
-
-export async function restoreAccount(id: string, data: any) {
- try {
-   const foundedUser = await userRepository.findRestorableUserByUsername(data.username);
-
-   if(!foundedUser){
-    await bcrypt.compare("fake-password", "$2b$10$9WuW0iHmGl4QPQFW0lm4qOhfakehashwi.DXuPgJ07rKjkYHhiGm")
-    throw new Error("Invalid Credencials")
-   }
-
-   const userMatch = await bcrypt.compare(data.password,foundedUser.password)
-
-    if(!userMatch){
-        throw new Error("Invalid Credencials")
-    }
-
-    await userRepository.restoreAccountById(foundedUser.id)
-
-     return { 
-      restoredUser: foundedUser.username
-    };
-
- } catch (error) {
-    throw error;
- }
-}

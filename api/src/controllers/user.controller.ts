@@ -114,15 +114,3 @@ export async function adminDeleteUser(req: Request, res: Response) {
     res.status(422).json({error:err.message})
   }
 }
-
-export async function restoreAccount(req: Request, res: Response) {
-  try {
-    const userReq = (req as CustomRequest).user
-    const id = userReq.userId
-    const dataRestore = validators.userLoginSchema.parse(req.body)
-    await userService.restoreAccount(id, dataRestore)
-    res.status(200).send("User updated successfully")
-  } catch (err: any) {
-    res.status(422).json({error:err.message})
-  }
-}

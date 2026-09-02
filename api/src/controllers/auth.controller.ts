@@ -57,3 +57,13 @@ export async function revokeToken(req: Request, res: Response) {
     res.status(400).json({error: err.message})
   }
 }
+
+export async function restoreAccount(req: Request, res: Response) {
+  try {
+    const dataRestore = validators.userLoginSchema.parse(req.body)
+    await authService.restoreAccount(dataRestore)
+    res.status(200).send("User updated successfully")
+  } catch (err: any) {
+    res.status(422).json({error:err.message})
+  }
+}
