@@ -16,7 +16,7 @@ export async function registerUser(req: Request, res: Response) {
   try {
     const user = validators.userCreateSchema.parse(req.body);
     await authService.registerUser(user)
-    res.status(200).json({state: "sucess", message: "User successfully created"})
+    res.status(201).json({state: "sucess", message: "User successfully created"})
   } catch (err: any) {
     res.status(400).json({state: "error", code: "SIGNUP_FAILED", message: err.message})
   }
@@ -31,7 +31,7 @@ export async function refreshToken(req: Request, res: Response) {
     }
 
     const refresh = await authService.refresh(refreshToken)
-    res.status(200).json({state: "sucess", message: "Token successfully refreshed", response: refresh})
+    res.status(201).json({state: "sucess", message: "Token successfully refreshed", response: refresh})
     
     
   } catch (err: any) {

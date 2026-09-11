@@ -1,12 +1,13 @@
 import { Router } from "express"
-import { createUser, adminGetUserById, adminGetUsers, getAdminMe ,adminUpdateUser, updateUser, deleteUser, adminDeleteUser } from "../controllers/user.controller"
+import { adminGetUserById, adminGetUsers, getAdminMe ,adminUpdateUser, updateUser, deleteUser, adminDeleteUser } from "../controllers/user.controller"
 import { auth, authorize } from "../middleware/auth.middleware"
 import { sensitiveLimiter, softLimiter } from "../middleware/rate.limit.middleware"
+import { registerUser } from "../controllers/auth.controller"
 
 const router = Router()
 
 //admin
-router.post("/user", auth, authorize("admin"), sensitiveLimiter, createUser)
+router.post("/user", auth, authorize("admin"), sensitiveLimiter, registerUser)
 router.get("/users", auth, authorize("admin"), softLimiter, adminGetUsers)
 router.get("/user/:id", auth, authorize("admin"), softLimiter, adminGetUserById)
 router.patch("/user/:id", auth, authorize("admin"), sensitiveLimiter, adminUpdateUser)
