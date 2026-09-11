@@ -1,4 +1,4 @@
 ## Backlog
 - consume an API with the frontend
 - test CRUD 
-- add restore account end-point
+- testar end-point restore, padronizar retornos de mensagem do service
