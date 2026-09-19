@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 import * as userService from "../services/user.service"
-import * as authService from "../services/auth.service"
 import { CustomRequest } from "../middleware/auth.middleware"
 import * as validators from "../utils/validators"
 
@@ -19,11 +18,10 @@ export async function adminGetUsers(req: Request, res: Response) {
 
 export async function adminGetUserById(req: Request, res: Response) {
   try {
-    const { id } = req.params
-    if(typeof id !== "string"){
-      return res.status(400).json({state: "error", code: "GET_USER_BY_ID_FAILED", message: "Invalid Id"})
-    }
+    const { id } = validators.userIdSchema.parse(req.params)
+
     const user = await userService.getAdmin(id)
+    
     if (!user) {
       return res.status(404).json({state: "error", code: "GET_USER_BY_ID_FAILED", message: "User Not Found"})
     }
@@ -38,6 +36,7 @@ export async function getUser(req: Request, res: Response) {
     const userReq = (req as CustomRequest).user
     const id = userReq.userId
     const userFounded = await userService.getUser(id)
+
     if (!userFounded) {
       return res.status(404).json({state: "error", code: "GET_USER_FAILED", message: "User Not Found"})
   }
@@ -52,6 +51,7 @@ export async function getAdminMe(req: Request, res: Response) {
     const userReq = (req as CustomRequest).user
     const id = userReq.userId
     const userFounded = await userService.getAdmin(id)
+
     if (!userFounded) {
       return res.status(404).json({state: "error", code: "GET_USER_FAILED", message: "User Not Found"})
   }
@@ -63,10 +63,8 @@ export async function getAdminMe(req: Request, res: Response) {
 
 export async function adminUpdateUser(req: Request, res: Response) {
   try {
-    const { id } = req.params
-    if (typeof id !== "string") {
-      return res.status(400).json({state: "error", code: "UPDATE_USER_FAILED", message: "Invalid Id"})
-  }
+    const { id } = validators.userIdSchema.parse(req.params)
+    
     const dataUpdate = validators.userUpdateSchema.parse(req.body)
     await userService.updateUser(id, dataUpdate)
     res.status(200).json({state: "sucess", message: "User successfully updated"})
